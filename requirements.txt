@@ -1,0 +1,20 @@
+# PDF Extractor - Required Python Packages
+
+# GUI Framework
+ttkbootstrap>=1.10.1
+
+# PDF Processing
+pdfplumber>=0.10.0
+
+# Excel/CSV handling
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# Windows/Outlook integration
+pywin32>=305
+
+# Build tool (for creating .exe)
+pyinstaller>=5.13.0
+
+# Image processing (for icon generation)
+Pillow>=10.0.0

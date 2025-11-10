@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# PyInstaller
+*.spec.swp
+build/
+dist/
+*.exe
+*.app
+*.manifest
+
+# Build artifacts
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code settings
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Project specific
+test_pdfs/
+PDFs/
+*.xlsx
+*.csv
+PO_Data.*
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# User settings
+.pdf_extractor_settings.json
+
+# Icon generation script output (keep source, ignore if regenerated)
+# Uncomment if you want to track icons in git:
+# !icon.png
+# !icon.ico

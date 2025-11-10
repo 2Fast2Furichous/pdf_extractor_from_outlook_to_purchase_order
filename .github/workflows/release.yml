@@ -1,0 +1,116 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Generate icon
+      run: |
+        python create_icon.py
+
+    - name: Build executable
+      run: |
+        cd src
+        python -m PyInstaller PDF_Extractor.spec --clean
+
+    - name: Get version from tag
+      id: get_version
+      shell: bash
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=dev-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Calculate SHA256
+      id: sha256
+      shell: bash
+      run: |
+        cd src
+        if [ -f "../dist/PDF_Extractor.exe" ]; then
+          SHA256=$(sha256sum ../dist/PDF_Extractor.exe | awk '{print $1}')
+          echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+        fi
+
+    - name: Create release notes
+      id: release_notes
+      shell: bash
+      run: |
+        cat > release_notes.md << 'EOF'
+        ## PDF Data Extractor - ${{ steps.get_version.outputs.VERSION }}
+
+        ### Features
+        - Extract PO data from PDF attachments in Outlook emails
+        - Export to Excel with automatic formatting
+        - Deduplication of entries
+        - Save and restore search settings
+        - Professional GUI with custom icon
+
+        ### Installation
+        1. Download `PDF_Extractor.exe` below
+        2. Run the executable (no installation required)
+        3. If Windows SmartScreen appears, click "More info" → "Run anyway"
+
+        ### Security
+        - **SHA256**: `${{ steps.sha256.outputs.SHA256 }}`
+        - Source code is available in this repository
+        - Built automatically via GitHub Actions
+        - See [README_SECURITY.md](README_SECURITY.md) for more information
+
+        ### System Requirements
+        - Windows 10/11
+        - Microsoft Outlook installed
+        - No Python installation required
+
+        ### For IT/Security Teams
+        - Full source code available for review
+        - Can be built and signed with your own certificate
+        - See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for corporate deployment options
+
+        ---
+
+        **Note**: This executable may trigger antivirus false positives due to PyInstaller.
+        This is normal. See the security documentation for details on verification and whitelisting.
+        EOF
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          dist/PDF_Extractor.exe
+        body_path: release_notes.md
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload artifact (for manual runs)
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      uses: actions/upload-artifact@v4
+      with:
+        name: PDF_Extractor-${{ steps.get_version.outputs.VERSION }}
+        path: dist/PDF_Extractor.exe
+        retention-days: 30
