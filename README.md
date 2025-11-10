@@ -88,21 +88,6 @@ build_standalone.bat
 - Ship To Address
 - Ordering Office
 
-## Security & Antivirus
-
-This application may trigger antivirus false positives due to PyInstaller. This is a known issue with Python-based executables.
-
-**For verification**:
-- Check the SHA256 hash (provided in release notes)
-- Review the [source code](src/pdf_extractor_app.py)
-- See [README_SECURITY.md](README_SECURITY.md) for detailed security information
-
-**For IT/Security teams**:
-- Full source code available for audit
-- Build instructions included
-- Corporate deployment guide available
-- See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
-
 ## Development
 
 ### Project Structure
@@ -121,9 +106,7 @@ pdf-extractor/
 ├── icon.ico / icon.png          # Application icon
 ├── requirements.txt             # Python dependencies
 ├── .gitignore                   # Git ignore rules
-├── README.md                    # This file
-├── README_SECURITY.md           # Security documentation
-└── DEPLOYMENT_GUIDE.md          # Corporate deployment guide
+└── README.md                    # This file
 ```
 
 ### Building Releases
@@ -144,16 +127,6 @@ GitHub Actions will automatically:
 - Create a GitHub release
 - Attach the executable
 
-See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for detailed instructions.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## Technology Stack
 
 - **GUI**: ttkbootstrap (modern Tkinter themes)
@@ -162,20 +135,13 @@ See [RELEASE_PROCESS.md](RELEASE_PROCESS.md) for detailed instructions.
 - **Outlook Integration**: pywin32 (COM interface)
 - **Build**: PyInstaller
 
-## License
-
-[Specify your license here]
-
 ## Support
 
 For issues, questions, or feature requests:
 - Open an [Issue](../../issues)
-- Contact your IT department (for corporate installations)
 
 ## Changelog
 
 See [Releases](../../releases) for version history and changes.
 
 ---
-
-**Disclaimer**: This tool is designed for legitimate business use. Ensure you have appropriate permissions to access emails and extract data from PDFs in your organization.
