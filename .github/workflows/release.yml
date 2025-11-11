@@ -79,7 +79,6 @@ jobs:
         - **SHA256**: `${{ steps.sha256.outputs.SHA256 }}`
         - Source code is available in this repository
         - Built automatically via GitHub Actions
-        - See [README_SECURITY.md](README_SECURITY.md) for more information
 
         ### System Requirements
         - Windows 10/11
@@ -89,8 +88,6 @@ jobs:
         ### For IT/Security Teams
         - Full source code available for review
         - Can be built and signed with your own certificate
-        - See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for corporate deployment options
-
         ---
 
         **Note**: This executable may trigger antivirus false positives due to PyInstaller.
