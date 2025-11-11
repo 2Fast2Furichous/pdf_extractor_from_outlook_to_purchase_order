@@ -140,6 +140,10 @@ GitHub Actions will automatically:
 For issues, questions, or feature requests:
 - Open an [Issue](../../issues)
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ## Changelog
 
 See [Releases](../../releases) for version history and changes.
