@@ -68,7 +68,6 @@ jobs:
         - Export to Excel with automatic formatting
         - Deduplication of entries
         - Save and restore search settings
-        - Professional GUI with custom icon
 
         ### Installation
         1. Download `PDF_Extractor.exe` below
@@ -84,6 +83,7 @@ jobs:
         - Windows 10/11
         - Microsoft Outlook installed
         - No Python installation required
+        - Edge required for HTML rendering
 
         ### For IT/Security Teams
         - Full source code available for review
