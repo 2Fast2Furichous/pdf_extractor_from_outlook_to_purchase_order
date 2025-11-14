@@ -59,6 +59,7 @@ class PDFExtractorApp:
         self.folder_var = tk.StringVar()
         self.subject_var = tk.StringVar()
         self.start_date_var = tk.StringVar()
+        self.end_date_var = tk.StringVar()
         self.output_path_var = tk.StringVar()
 
         # Set default output path (Excel file now)
@@ -121,7 +122,15 @@ class PDFExtractorApp:
 
         # Start Date
         ttk.Label(input_frame, text="Start Date (MM/DD/YYYY):").grid(row=3, column=0, sticky="w", pady=8, padx=5)
-        ttk.Entry(input_frame, textvariable=self.start_date_var, width=50).grid(row=3, column=1, pady=8, padx=5)
+        start_date_entry = ttk.DateEntry(input_frame, dateformat="%m/%d/%Y", width=47)
+        start_date_entry.grid(row=3, column=1, pady=8, padx=5, sticky="w")
+        start_date_entry.entry.configure(textvariable=self.start_date_var)
+
+        # End Date
+        ttk.Label(input_frame, text="End Date (MM/DD/YYYY):").grid(row=4, column=0, sticky="w", pady=8, padx=5)
+        end_date_entry = ttk.DateEntry(input_frame, dateformat="%m/%d/%Y", width=47)
+        end_date_entry.grid(row=4, column=1, pady=8, padx=5, sticky="w")
+        end_date_entry.entry.configure(textvariable=self.end_date_var)
 
         # Output Frame
         output_frame = ttk.Labelframe(self.root, text="Output Settings", padding=15)
@@ -174,6 +183,7 @@ class PDFExtractorApp:
             folder_text = self.folder_var.get().strip()
             subject_text = self.subject_var.get().strip()
             start_date_str = self.start_date_var.get().strip()
+            end_date_str = self.end_date_var.get().strip()
             output_path = self.output_path_var.get().strip()
 
             # Save settings for next run
@@ -186,7 +196,17 @@ class PDFExtractorApp:
                     start_date = datetime.strptime(start_date_str, "%m/%d/%Y")
                     self.log(f"Filter: Emails after {start_date.strftime('%Y-%m-%d')}")
                 except ValueError:
-                    messagebox.showerror("Error", "Invalid date format. Use MM/DD/YYYY")
+                    messagebox.showerror("Error", "Invalid start date format. Use MM/DD/YYYY")
+                    return
+
+            # Parse end date
+            end_date = None
+            if end_date_str:
+                try:
+                    end_date = datetime.strptime(end_date_str, "%m/%d/%Y")
+                    self.log(f"Filter: Emails before {end_date.strftime('%Y-%m-%d')}")
+                except ValueError:
+                    messagebox.showerror("Error", "Invalid end date format. Use MM/DD/YYYY")
                     return
 
             # Connect to Outlook
@@ -206,7 +226,7 @@ class PDFExtractorApp:
 
             # Filter emails
             self.log(f"Filtering emails with subject containing: '{subject_text}'")
-            emails = self.filter_emails(target_folder, subject_text, start_date)
+            emails = self.filter_emails(target_folder, subject_text, start_date, end_date)
             self.log(f"Found {len(emails)} matching emails")
 
             if not emails:
@@ -378,7 +398,7 @@ class PDFExtractorApp:
         except:
             return None
 
-    def filter_emails(self, folder, subject_text, start_date):
+    def filter_emails(self, folder, subject_text, start_date, end_date):
         """Filter emails by criteria"""
         matching_emails = []
 
@@ -396,19 +416,23 @@ class PDFExtractorApp:
                     if subject_text and subject_text.lower() not in item.Subject.lower():
                         continue
 
-                    # Check date
-                    if start_date:
-                        try:
-                            received_date = item.ReceivedTime
-                            # Compare just the date parts (year, month, day) to avoid type issues
-                            received_date_only = datetime(received_date.year, received_date.month, received_date.day)
+                    # Check date range
+                    try:
+                        received_date = item.ReceivedTime
+                        # Compare just the date parts (year, month, day) to avoid type issues
+                        received_date_only = datetime(received_date.year, received_date.month, received_date.day)
 
-                            if received_date_only < start_date:
-                                continue
-                        except Exception as date_err:
-                            # If date conversion fails, log and skip date check for this email
-                            self.log(f"    Warning: Date conversion failed: {date_err}")
-                            pass
+                        # Check start date
+                        if start_date and received_date_only < start_date:
+                            continue
+
+                        # Check end date
+                        if end_date and received_date_only > end_date:
+                            continue
+                    except Exception as date_err:
+                        # If date conversion fails, log and skip date check for this email
+                        self.log(f"    Warning: Date conversion failed: {date_err}")
+                        pass
 
                     matching_emails.append(item)
                 except:
@@ -574,6 +598,9 @@ class PDFExtractorApp:
                                 part_num = part_num.split('/')[0].strip()
                             part_num = part_num.replace('\n', ' ').strip()
 
+                            # Format delivery date to YYYYMMDD
+                            delivery_date = self.format_date_to_yyyymmdd(delivery_date)
+
                             data.append({
                                 'pdf_file': pdf_name,
                                 'order_number': order_number,
@@ -667,6 +694,9 @@ class PDFExtractorApp:
                                 elif price_match:
                                     amount = price_match.group()
 
+                        # Format delivery date to YYYYMMDD
+                        delivery_date = self.format_date_to_yyyymmdd(delivery_date)
+
                         if part_num:
                             data.append({
                                 'pdf_file': pdf_name,
@@ -695,9 +725,31 @@ class PDFExtractorApp:
         return match.group(1) if match else ""
 
     def extract_order_date(self, text):
-        """Extract order date"""
+        """Extract order date and format as YYYYMMDD"""
         match = re.search(r'\d{1,2}-[A-Za-z]{3}-\d{4}', text)
-        return match.group() if match else ""
+        if match:
+            try:
+                # Parse the date (format like "1-Jan-2024")
+                date_obj = datetime.strptime(match.group(), "%d-%b-%Y")
+                # Return in YYYYMMDD format
+                return date_obj.strftime("%Y%m%d")
+            except ValueError:
+                # If parsing fails, return the original
+                return match.group()
+        return ""
+
+    def format_date_to_yyyymmdd(self, date_str):
+        """Convert date string to YYYYMMDD format"""
+        if not date_str:
+            return ""
+        try:
+            # Parse the date (format like "1-Jan-2024" or "01-Jan-2024")
+            date_obj = datetime.strptime(date_str.strip(), "%d-%b-%Y")
+            # Return in YYYYMMDD format
+            return date_obj.strftime("%Y%m%d")
+        except ValueError:
+            # If parsing fails, return the original
+            return date_str
 
     def extract_ship_to_coordinates(self, page):
         """Extract ship to address using pdfplumber coordinate-based extraction"""
@@ -868,9 +920,9 @@ class PDFExtractorApp:
             if 'Order Number' in new_df.columns:
                 new_df['Order Number'] = pd.to_numeric(new_df['Order Number'], errors='coerce').astype('Int64')
 
-            # Line: convert to float (e.g., 1.1, 2.1)
+            # Line: keep as string
             if 'Line' in new_df.columns:
-                new_df['Line'] = pd.to_numeric(new_df['Line'], errors='coerce')
+                new_df['Line'] = new_df['Line'].astype(str)
 
             # Check if file exists and append if it does
             if os.path.exists(output_path):
@@ -883,6 +935,22 @@ class PDFExtractorApp:
                     existing_df = pd.read_csv(output_path)
 
                 self.log(f"Successfully read existing file with {len(existing_df)} rows")
+
+                # CRITICAL: Convert existing data to match new data types before combining
+                # This prevents duplicate detection failures due to type mismatches
+                # Convert Order Number to Int64 (must match new_df)
+                if 'Order Number' in existing_df.columns:
+                    existing_df['Order Number'] = pd.to_numeric(existing_df['Order Number'], errors='coerce').astype('Int64')
+
+                # Convert Line to string (must match new_df)
+                if 'Line' in existing_df.columns:
+                    existing_df['Line'] = existing_df['Line'].astype(str)
+
+                # Convert numeric columns to numeric types (must match new_df)
+                for col in ['Quantity', 'Unit Price', 'Amount']:
+                    if col in existing_df.columns:
+                        existing_df[col] = existing_df[col].astype(str).str.replace(',', '')
+                        existing_df[col] = pd.to_numeric(existing_df[col], errors='coerce')
 
                 # Combine old and new data
                 combined_df = pd.concat([existing_df, new_df], ignore_index=True)
@@ -963,18 +1031,7 @@ class PDFExtractorApp:
             except:
                 pass
 
-            # Format Line as number with conditional decimals
-            try:
-                if 'Line' in df.columns:
-                    col_idx = list(df.columns).index('Line') + 1
-                    col_letter = get_column_letter(col_idx)
-
-                    for row in range(2, ws.max_row + 1):
-                        cell = ws[f'{col_letter}{row}']
-                        if cell.value is not None:
-                            cell.number_format = '0.0#'  # Show up to 2 decimals only if needed (1, 1.1, 1.23)
-            except:
-                pass
+            # Line column is kept as text (no special formatting needed)
 
             # Format number columns with thousand separators
             from openpyxl.styles import numbers
@@ -1020,6 +1077,7 @@ class PDFExtractorApp:
                 'folder_contains': self.folder_var.get(),
                 'subject_contains': self.subject_var.get(),
                 'start_date': self.start_date_var.get(),
+                'end_date': self.end_date_var.get(),
                 'output_path': self.output_path_var.get()
             }
             with open(self.settings_file, 'w') as f:
@@ -1039,6 +1097,7 @@ class PDFExtractorApp:
                 self.folder_var.set(settings.get('folder_contains', ''))
                 self.subject_var.set(settings.get('subject_contains', ''))
                 self.start_date_var.set(settings.get('start_date', ''))
+                self.end_date_var.set(settings.get('end_date', ''))
 
                 # Only load output path if it's not the default
                 saved_output = settings.get('output_path', '')
