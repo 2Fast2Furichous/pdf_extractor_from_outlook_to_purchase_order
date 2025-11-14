@@ -26,7 +26,6 @@ if %errorlevel% equ 0 (
     echo.
     echo Build failed. Check error messages above.
 )
-pause
 
 
 if %errorlevel% neq 0 (

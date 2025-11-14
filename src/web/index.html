@@ -4,14 +4,57 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>PDF Data Extractor - Outlook</title>
+	<title>PDF Data Extractor</title>
 	<script src="https://cdn.tailwindcss.com"></script>
 	<script src="/eel.js"></script>
 	<style>
-		/* Previous styles remain the same */
-		@keyframes slideIn {
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			height: 100%;
+			overflow: hidden;
+		}
+
+		body {
+			background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%);
+			color: #ffffff;
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+			display: flex;
+			height: 100vh;
+			padding: 1rem;
+			perspective: 1000px;
+		}
+
+		/* Container */
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			width: 100%;
+			height: 100%;
+			display: grid;
+			grid-template-rows: auto 1fr;
+			gap: 1rem;
+			transform-style: preserve-3d;
+		}
+
+		/* Header */
+		.header-section {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 1rem;
+			padding: 0.5rem 0;
+			animation: header-animation 0.8s ease-out;
+		}
+
+		@keyframes header-animation {
 			from {
-				transform: translateY(-10px);
+				transform: translateY(-50px);
 				opacity: 0;
 			}
 
@@ -21,40 +64,260 @@
 			}
 		}
 
-		.slide-in {
-			animation: slideIn 0.3s ease-out;
+		/* Main grid */
+		.main-grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			min-height: 0;
 		}
 
-		.glass {
-			background: rgba(255, 255, 255, 0.95);
+		/* Glassy Form Card */
+		.form {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			padding: 20px;
+			background: rgba(0, 0, 0, 0.6);
+			border-radius: 15px;
+			overflow: visible;
+			perspective: 1000px;
+			transform-style: preserve-3d;
+			transform: translateZ(0);
+			transition: all 0.3s ease-in-out;
 			backdrop-filter: blur(10px);
-			border: 1px solid rgba(255, 255, 255, 0.2);
+			box-shadow:
+				rgba(0, 0, 0, 0.6) 0px 2px 4px,
+				rgba(0, 0, 0, 0.5) 0px 7px 13px -3px,
+				rgba(0, 0, 0, 0.3) 0px -3px 0px inset;
+			animation: form-animation 0.5s ease-in-out;
+			position: relative;
+			z-index: 1;
 		}
 
-		.custom-scrollbar::-webkit-scrollbar {
-			width: 8px;
+		.form:hover {
+			transform: translateZ(5px) scale(1.01);
+			z-index: 10;
 		}
 
-		.custom-scrollbar::-webkit-scrollbar-track {
-			background: #f1f1f1;
+		@keyframes form-animation {
+			from {
+				transform: translateY(-20px);
+				opacity: 0;
+			}
+
+			to {
+				transform: translateZ(0);
+				opacity: 1;
+			}
+		}
+
+		/* Glassy Input */
+		.input {
+			padding: 10px;
+			border-radius: 15px;
+			background: rgba(0, 0, 0, 0.4);
+			border: 2px solid rgba(255, 255, 255, 0.2);
+			backdrop-filter: blur(8px);
+			box-shadow:
+				0px 2px 4px rgba(0, 0, 0, 0.5),
+				0px 7px 13px rgba(0, 0, 0, 0.3),
+				inset 0px -3px 0px rgba(0, 0, 0, 0.2);
+			color: white;
+			transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			transform-style: preserve-3d;
+			backface-visibility: hidden;
+			font-size: 12px;
+			height: 35px;
+			width: 100%;
+			transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px);
+			will-change: transform;
+		}
+
+		.input::placeholder {
+			color: rgba(255, 255, 255, 0.7);
+		}
+
+		/* Apply to all input types explicitly */
+		input.input:hover,
+		input[type="text"].input:hover,
+		input[type="date"].input:hover,
+		.input:hover {
+			border-color: rgba(255, 255, 255, 0.4);
+			background-color: rgba(0, 0, 0, 0.6);
+			transform: perspective(1000px) rotateY(10deg) rotateX(4deg) translateZ(10px);
+			box-shadow:
+				-5px 5px 15px rgba(0, 0, 0, 0.6),
+				0px 10px 25px rgba(59, 130, 246, 0.15),
+				inset 0px -3px 0px rgba(0, 0, 0, 0.3);
+		}
+
+		input.input:focus,
+		input[type="text"].input:focus,
+		input[type="date"].input:focus,
+		.input:focus {
+			border-color: rgba(59, 130, 246, 0.6);
+			background-color: rgba(0, 0, 0, 0.7);
+			transform: perspective(1000px) rotateY(7deg) rotateX(2deg) translateZ(7px);
+			box-shadow:
+				-3px 3px 12px rgba(59, 130, 246, 0.3),
+				0px 8px 20px rgba(0, 0, 0, 0.4),
+				inset 0px -3px 0px rgba(59, 130, 246, 0.2);
+			outline: none;
+		}
+
+		/* Special reduced rotation for email field due to its width */
+		#email:hover {
+			transform: perspective(1000px) rotateY(5deg) rotateX(2deg) translateZ(5px) !important;
+		}
+
+		#email:focus {
+			transform: perspective(1000px) rotateY(3deg) rotateX(1deg) translateZ(3px) !important;
+		}
+
+		/* Glassy Button */
+		button,
+		.btn {
+			padding: 10px 20px;
+			border: none;
 			border-radius: 10px;
+			background: rgba(0, 0, 0, 0.6);
+			color: #fff;
+			font-size: 13px;
+			cursor: pointer;
+			transform-style: preserve-3d;
+			backface-visibility: hidden;
+			transform: translateZ(0);
+			transition: all 0.3s ease-in-out;
+			box-shadow:
+				rgba(0, 0, 0, 0.5) 0px 2px 4px,
+				rgba(0, 0, 0, 0.4) 0px 7px 13px -3px,
+				rgba(0, 0, 0, 0.3) 0px -3px 0px inset;
+			text-transform: uppercase;
+			font-weight: 600;
+			letter-spacing: 0.5px;
+			height: 35px;
+			position: relative;
+			z-index: 5;
 		}
 
-		.custom-scrollbar::-webkit-scrollbar-thumb {
-			background: #888;
+		button:hover,
+		.btn:hover {
+			background-color: rgba(255, 255, 255, 0.2);
+			transform: translateZ(10px) scale(1.05);
+			box-shadow:
+				rgba(0, 0, 0, 0.5) 0px 4px 8px,
+				rgba(0, 0, 0, 0.3) 0px 10px 20px,
+				inset 0px -3px 0px rgba(0, 0, 0, 0.2);
+			z-index: 15;
+		}
+
+		.btn-primary {
+			background: rgba(59, 130, 246, 0.6);
+		}
+
+		.btn-primary:hover {
+			background: rgba(59, 130, 246, 0.8);
+		}
+
+		/* Labels */
+		.label {
+			color: rgba(255, 255, 255, 0.9);
+			font-size: 11px;
+			font-weight: 600;
+			margin-bottom: 5px;
+			display: block;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		/* Progress log */
+		.progress-log {
+			background: rgba(0, 0, 0, 0.4);
+			border-radius: 15px;
+			border: 2px solid rgba(255, 255, 255, 0.2);
+			backdrop-filter: blur(8px);
+			padding: 1rem;
+			flex: 1;
+			overflow: hidden;
+			box-shadow:
+				0px 2px 4px rgba(0, 0, 0, 0.5),
+				0px 7px 13px rgba(0, 0, 0, 0.3),
+				inset 0px -3px 0px rgba(0, 0, 0, 0.2);
+		}
+
+		/* Progress bar */
+		.progress-bg {
+			background: rgba(0, 0, 0, 0.4);
+			height: 6px;
 			border-radius: 10px;
+			overflow: hidden;
+			backdrop-filter: blur(5px);
 		}
 
-		.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-			background: #555;
+		.progress-fill {
+			background: linear-gradient(90deg, #2a5298 0%, #3b82f6 100%);
+			height: 100%;
+			transition: width 0.3s ease;
 		}
 
+		/* Title */
+		.title {
+			font-size: 24px;
+			font-weight: 900;
+			color: #ffffff;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		}
+
+		.subtitle {
+			font-size: 11px;
+			color: rgba(255, 255, 255, 0.8);
+		}
+
+		/* Section heading */
+		.section-heading {
+			font-size: 12px;
+			font-weight: 700;
+			color: rgba(255, 255, 255, 0.9);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin: 1rem 0 0.5rem 0;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		/* Icon box */
+		.icon-box {
+			width: 50px;
+			height: 50px;
+			background: rgba(0, 0, 0, 0.6);
+			border-radius: 15px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			backdrop-filter: blur(10px);
+			box-shadow:
+				rgba(0, 0, 0, 0.6) 0px 2px 4px,
+				rgba(0, 0, 0, 0.5) 0px 7px 13px -3px;
+			transform: rotateX(-10deg);
+			transition: transform 0.3s ease;
+		}
+
+		.icon-box:hover {
+			transform: rotateX(0deg) scale(1.1);
+		}
+
+		/* Spinner */
 		.spinner {
-			border: 3px solid #f3f3f3;
-			border-top: 3px solid #3b82f6;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-top: 2px solid #fff;
 			border-radius: 50%;
-			width: 40px;
-			height: 40px;
+			width: 24px;
+			height: 24px;
 			animation: spin 1s linear infinite;
 		}
 
@@ -68,159 +331,208 @@
 			}
 		}
 
+		/* Status dot */
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			display: inline-block;
+			margin-right: 6px;
+			box-shadow: 0 0 5px currentColor;
+		}
+
+		.status-dot.active {
+			background: #4ade80;
+		}
+
+		.status-dot.processing {
+			background: #fbbf24;
+			animation: pulse 1s infinite;
+		}
+
+		.status-dot.error {
+			background: #f87171;
+		}
+
+		@keyframes pulse {
+
+			0%,
+			100% {
+				opacity: 1;
+			}
+
+			50% {
+				opacity: 0.5;
+			}
+		}
+
+		/* Divider */
+		.divider {
+			height: 1px;
+			background: rgba(255, 255, 255, 0.2);
+			margin: 1rem 0;
+		}
+
+		/* Date picker */
 		input[type="date"]::-webkit-calendar-picker-indicator {
+			filter: invert(1);
 			cursor: pointer;
-			filter: invert(0.5);
+			opacity: 0.7;
+		}
+
+		/* Grid utilities */
+		.grid-2 {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.75rem;
+		}
+
+		.flex {
+			display: flex;
+		}
+
+		.flex-between {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.gap-2 {
+			gap: 0.5rem;
+		}
+
+		.text-center {
+			text-align: center;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.mb-2 {
+			margin-bottom: 0.5rem;
+		}
+
+		.mt-2 {
+			margin-top: 0.5rem;
+		}
+
+		.mt-3 {
+			margin-top: 0.75rem;
 		}
 	</style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-	<div class="container mx-auto p-6 max-w-4xl">
+<body>
+	<div class="container">
 		<!-- Header -->
-		<div class="text-center mb-8 slide-in">
-			<div class="inline-flex items-center justify-center w-20 h-20 bg-red-500 rounded-lg shadow-lg mb-4">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24"
-					stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+		<div class="header-section">
+			<div class="icon-box">
+				<svg xmlns="http://www.w3.org/2000/svg" style="width: 28px; height: 28px;" fill="none"
+					viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+					<path stroke-linecap="round" stroke-linejoin="round"
 						d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-						d="M11 11l2 2m0 0l2-2m-2 2V7" />
+					<path stroke-linecap="round" stroke-linejoin="round" d="M11 11l2 2m0 0l2-2m-2 2V7" />
 				</svg>
 			</div>
-			<h1 class="text-4xl font-bold text-gray-800 mb-2">PDF Data Extractor</h1>
-			<p class="text-gray-600">Extract PO data from Outlook email attachments</p>
+			<div>
+				<h1 class="title">PDF DATA EXTRACTOR</h1>
+				<p class="subtitle">Extract PO data from Outlook email attachments</p>
+			</div>
 		</div>
 
-		<!-- Main Form (same as before) -->
-		<div class="glass rounded-2xl shadow-xl p-8 mb-6 slide-in">
-			<!-- Email Filter Section -->
-			<div class="mb-8">
-				<h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
-						viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-					</svg>
-					Email Filter Criteria
-				</h2>
+		<!-- Main Grid -->
+		<div class="main-grid">
+			<!-- Left Column - Form -->
+			<form class="form">
+				<div class="section-heading">
+					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
+					EMAIL FILTER
+				</div>
 
-				<div class="grid gap-4">
+				<label class="label">Email Address</label>
+				<input type="text" id="email" placeholder="user@company.com" class="input">
+
+				<div class="grid-2 mb-2">
 					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-						<input type="text" id="email" placeholder="user@company.com"
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+						<label class="label">Folder</label>
+						<input type="text" id="folder" placeholder="Inbox" class="input">
 					</div>
-
 					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Folder Contains</label>
-						<input type="text" id="folder" placeholder="Inbox"
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-1">Subject Contains</label>
-						<input type="text" id="subject" placeholder="Purchase Order"
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-					</div>
-
-					<div class="grid grid-cols-2 gap-4">
-						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-							<input type="date" id="startDate"
-								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-						</div>
-
-						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-							<input type="date" id="endDate"
-								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-						</div>
+						<label class="label">Subject</label>
+						<input type="text" id="subject" placeholder="Purchase Order" class="input">
 					</div>
 				</div>
-			</div>
 
-			<!-- Output Settings Section -->
-			<div class="mb-8">
-				<h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none"
-						viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-							d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-					</svg>
-					Output Settings
-				</h2>
+				<div class="grid-2 mb-2">
+					<div>
+						<label class="label">Start Date</label>
+						<input type="date" id="startDate" class="input">
+					</div>
+					<div>
+						<label class="label">End Date</label>
+						<input type="date" id="endDate" class="input">
+					</div>
+				</div>
 
+				<div class="divider"></div>
+
+				<div class="section-heading">
+					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
+					OUTPUT SETTINGS
+				</div>
+
+				<label class="label">Output File</label>
 				<div class="flex gap-2">
-					<input type="text" id="outputPath" placeholder="PO_Data.xlsx" value="PO_Data.xlsx"
-						class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-					<button onclick="browseOutput()"
-						class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200 flex items-center">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-							stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-						</svg>
+					<input type="text" id="outputPath" placeholder="PO_Data.xlsx" value="PO_Data.xlsx" class="input"
+						style="flex: 1;">
+					<button type="button" onclick="browseOutput()" class="btn">
 						Browse
 					</button>
 				</div>
-			</div>
 
-			<!-- Extract Button -->
-			<div class="text-center">
-				<button id="extractBtn" onclick="startExtraction()"
-					class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-lg transition duration-200 transform hover:scale-105">
-					<span class="flex items-center">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-							stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-						</svg>
-						Extract PDFs from Outlook
-					</span>
-				</button>
-
-				<!-- Loading Spinner (hidden by default) -->
-				<div id="loadingSpinner" class="hidden mt-4">
-					<div class="spinner mx-auto"></div>
-					<p class="text-gray-600 mt-2">Processing...</p>
+				<div class="text-center mt-3">
+					<button type="button" id="extractBtn" onclick="startExtraction()" class="btn btn-primary"
+						style="width: 200px;">
+						Extract PDFs
+					</button>
+					<div id="loadingSpinner" class="hidden mt-2">
+						<div class="spinner" style="margin: 0 auto;"></div>
+						<p style="color: rgba(255, 255, 255, 0.7); font-size: 11px; margin-top: 6px;">Processing...</p>
+					</div>
 				</div>
-			</div>
-		</div>
+			</form>
 
-		<!-- Progress Section -->
-		<div class="glass rounded-2xl shadow-xl p-6 slide-in">
-			<h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none"
-					viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-						d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-				</svg>
-				Progress
-			</h2>
-
-			<!-- Progress Bar -->
-			<div id="progressBarContainer" class="hidden mb-4">
-				<div class="w-full bg-gray-200 rounded-full h-2.5">
-					<div id="progressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-						style="width: 0%"></div>
+			<!-- Right Column - Progress -->
+			<div class="form">
+				<div class="section-heading">
+					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
+					PROGRESS
 				</div>
-				<p id="progressText" class="text-sm text-gray-600 mt-1"></p>
-			</div>
 
-			<!-- Progress Log -->
-			<div id="progressLog"
-				class="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto custom-scrollbar font-mono text-sm text-gray-700">
-				<p class="text-gray-400">Ready to start extraction...</p>
-			</div>
-		</div>
+				<!-- Progress Bar -->
+				<div id="progressBarContainer" class="hidden mb-2">
+					<div class="progress-bg">
+						<div id="progressBar" class="progress-fill" style="width: 0%"></div>
+					</div>
+					<p style="color: rgba(255, 255, 255, 0.7); font-size: 11px; margin-top: 6px;" id="progressText"></p>
+				</div>
 
-		<!-- Status Bar -->
-		<div class="mt-6 text-center">
-			<div id="statusBar"
-				class="inline-flex items-center px-4 py-2 bg-gray-200 rounded-full text-sm text-gray-700">
-				<span class="inline-block w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-				<span id="statusText">Ready</span>
+				<!-- Progress Log -->
+				<div class="progress-log">
+					<div id="progressLog" style="font-family: monospace; font-size: 11px; line-height: 1.4;">
+						<p style="color: rgba(255, 255, 255, 0.7);">Ready to start extraction...</p>
+					</div>
+				</div>
+
+				<!-- Status Bar -->
+				<div class="flex-between mt-3">
+					<div class="flex" style="align-items: center;">
+						<span class="status-dot active"></span>
+						<span id="statusText" style="font-size: 11px; color: rgba(255, 255, 255, 0.8);">READY</span>
+					</div>
+					<div id="itemCount" style="font-size: 11px; color: rgba(255, 255, 255, 0.8);"></div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -228,6 +540,7 @@
 	<script>
 		// Global variables
 		let currentOutputPath = '';
+		const MAX_LOG_LINES = 10; // Maximum number of log lines to show
 
 		// Initialize on page load
 		window.addEventListener('DOMContentLoaded', async () => {
@@ -287,7 +600,7 @@
 
 			// Validate
 			if (!email || !folder || !outputPath) {
-				alert('Please fill in Email Address, Folder Contains, and Output File fields.');
+				alert('Please fill in Email Address, Folder, and Output File fields.');
 				return;
 			}
 
@@ -303,13 +616,19 @@
 			await eel.save_settings(settings)();
 
 			// Clear progress log
-			document.getElementById('progressLog').innerHTML = '<p class="text-gray-600">Starting extraction...</p>';
+			document.getElementById('progressLog').innerHTML = '<p style="color: rgba(255, 255, 255, 0.9); font-size: 11px;">Starting extraction...</p>';
+
+			// Update status
+			const statusDot = document.querySelector('.status-dot');
+			statusDot.classList.remove('active', 'error');
+			statusDot.classList.add('processing');
 
 			// Show loading
 			document.getElementById('extractBtn').disabled = true;
+			document.getElementById('extractBtn').style.opacity = '0.5';
 			document.getElementById('loadingSpinner').classList.remove('hidden');
 			document.getElementById('progressBarContainer').classList.remove('hidden');
-			document.getElementById('statusText').textContent = 'Processing...';
+			document.getElementById('statusText').textContent = 'PROCESSING...';
 
 			currentOutputPath = outputPath;
 
@@ -317,34 +636,45 @@
 			await eel.extract_pdfs_from_outlook(email, folder, subject, startDate, endDate, outputPath)();
 		}
 
-		// Update progress from Python
+		// Update progress from Python - keeps only last MAX_LOG_LINES lines
 		eel.expose(update_progress);
 		function update_progress(message) {
 			const logDiv = document.getElementById('progressLog');
 			const newLine = document.createElement('p');
 			newLine.textContent = message;
+			newLine.style.fontSize = '11px';
+			newLine.style.lineHeight = '1.4';
 
 			// Color code messages
 			if (message.includes('ERROR')) {
-				newLine.className = 'text-red-600 font-semibold';
+				newLine.style.color = '#ff6b6b';
+				newLine.style.fontWeight = '700';
 			} else if (message.includes('SUCCESS')) {
-				newLine.className = 'text-green-600 font-semibold';
+				newLine.style.color = '#51cf66';
+				newLine.style.fontWeight = '700';
 			} else if (message.includes('Warning')) {
-				newLine.className = 'text-yellow-600';
+				newLine.style.color = '#ffd43b';
 			} else if (message.startsWith('  ')) {
-				newLine.className = 'text-gray-500 ml-4';
+				newLine.style.color = 'rgba(255, 255, 255, 0.6)';
+				newLine.style.marginLeft = '10px';
 			} else {
-				newLine.className = 'text-gray-700';
+				newLine.style.color = 'rgba(255, 255, 255, 0.9)';
 			}
 
+			// Add new line
 			logDiv.appendChild(newLine);
-			logDiv.scrollTop = logDiv.scrollHeight;
+
+			// Keep only the last MAX_LOG_LINES lines
+			const lines = logDiv.getElementsByTagName('p');
+			while (lines.length > MAX_LOG_LINES) {
+				logDiv.removeChild(lines[0]);
+			}
 		}
 
 		// Update status
 		eel.expose(update_status);
 		function update_status(status) {
-			document.getElementById('statusText').textContent = status;
+			document.getElementById('statusText').textContent = status.toUpperCase();
 		}
 
 		// Set extraction progress
@@ -352,19 +682,23 @@
 		function set_extraction_progress(current, total) {
 			const percent = (current / total) * 100;
 			document.getElementById('progressBar').style.width = `${percent}%`;
-			document.getElementById('progressText').textContent = `Processing email ${current} of ${total}`;
+			document.getElementById('progressText').textContent = `${current} of ${total}`;
 		}
 
 		// Show error dialog
 		eel.expose(show_error);
 		function show_error(message) {
-			alert(`Error: ${message}`);
+			alert(`ERROR: ${message}`);
+			const statusDot = document.querySelector('.status-dot');
+			statusDot.classList.remove('active', 'processing');
+			statusDot.classList.add('error');
+			document.getElementById('statusText').textContent = 'ERROR';
 		}
 
 		// Show warning dialog
 		eel.expose(show_warning);
 		function show_warning(message) {
-			alert(`Warning: ${message}`);
+			alert(`WARNING: ${message}`);
 		}
 
 		// Show info dialog
@@ -376,24 +710,31 @@
 		// Ask retry for PDF save
 		eel.expose(ask_retry_pdf);
 		function ask_retry_pdf(filename) {
-			return confirm(`Cannot save PDF:\n${filename}\n\nThe file may be open or the folder may be locked.\nPlease close it and click 'OK' to retry.`);
+			return confirm(`Cannot save PDF:\n${filename}\n\nFile may be open. Close it and click OK to retry.`);
 		}
 
 		// Ask retry for file write
 		eel.expose(ask_retry_file);
 		function ask_retry_file(filepath, attempt, maxRetries) {
-			return confirm(`Cannot write to file:\n${filepath}\n\nThe file may be open in Excel or another program.\nPlease close the file and click 'OK' to retry.\n\nAttempt ${attempt} of ${maxRetries}`);
+			return confirm(`Cannot write to:\n${filepath}\n\nClose the file and click OK.\n\nAttempt ${attempt} of ${maxRetries}`);
 		}
 
 		// Extraction complete with prompt to open
 		eel.expose(extraction_complete_with_prompt);
 		function extraction_complete_with_prompt(itemCount, outputPath) {
+			// Update status
+			const statusDot = document.querySelector('.status-dot');
+			statusDot.classList.remove('processing', 'error');
+			statusDot.classList.add('active');
+
 			document.getElementById('extractBtn').disabled = false;
+			document.getElementById('extractBtn').style.opacity = '1';
 			document.getElementById('loadingSpinner').classList.add('hidden');
-			document.getElementById('statusText').textContent = `Complete! ${itemCount} items extracted`;
+			document.getElementById('statusText').textContent = 'COMPLETE';
+			document.getElementById('itemCount').textContent = `${itemCount} items`;
 
 			// Ask to open file
-			if (confirm(`Extracted ${itemCount} line items.\n\nOpen output file?`)) {
+			if (confirm(`Extracted ${itemCount} items.\n\nOpen output file?`)) {
 				eel.open_file(outputPath)();
 			}
 		}

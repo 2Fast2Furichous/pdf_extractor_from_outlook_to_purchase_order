@@ -578,6 +578,8 @@ class PDFExtractor:
     def write_output(self, output_path, data):
         """Write data to Excel or CSV file (append mode if exists) - EXACT ORIGINAL LOGIC WITH RETRY"""
         try:
+            output_path = os.path.abspath(os.path.normpath(output_path))
+
             if not data:
                 update_progress("Warning: No data to write")
                 return
@@ -1003,9 +1005,11 @@ def extract_pdfs_from_outlook(email_addr, folder_text, subject_text, start_date_
 def open_file(filepath):
     """Open file with default application"""
     try:
-        os.startfile(filepath)
+        normalized_path = os.path.abspath(os.path.normpath(filepath))
+        os.startfile(normalized_path)
         return True
-    except:
+    except Exception as e:
+        print(f"Error opening file: {e}")
         return False
 
 # Start the application
