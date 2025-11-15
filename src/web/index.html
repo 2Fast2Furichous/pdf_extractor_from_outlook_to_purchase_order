@@ -35,11 +35,19 @@
 			max-width: 1200px;
 			margin: 0 auto;
 			width: 100%;
-			height: 100%;
+			height: calc(100vh - 3rem);
+			/* More space for shadows */
+			min-height: 620px;
+			/* Increased to ensure button is always visible */
 			display: grid;
-			grid-template-rows: auto 1fr;
+			grid-template-rows: auto minmax(0, 1fr);
+			/* Key: minmax prevents overflow */
 			gap: 1rem;
 			transform-style: preserve-3d;
+			overflow: visible;
+			/* Allow shadows to show */
+			padding-bottom: 0.5rem;
+			/* Extra padding for bottom shadows */
 		}
 
 		/* Header */
@@ -69,7 +77,11 @@
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 1rem;
-			min-height: 0;
+			min-height: 520px;
+			/* Increased to ensure button area is always visible */
+			height: 100%;
+			overflow: visible;
+			/* Changed from hidden to visible for shadows */
 		}
 
 		/* Glassy Form Card */
@@ -81,7 +93,8 @@
 			padding: 20px;
 			background: rgba(0, 0, 0, 0.6);
 			border-radius: 15px;
-			overflow: visible;
+			overflow: hidden;
+			/* Hide overflow to prevent content escape */
 			perspective: 1000px;
 			transform-style: preserve-3d;
 			transform: translateZ(0);
@@ -94,6 +107,24 @@
 			animation: form-animation 0.5s ease-in-out;
 			position: relative;
 			z-index: 1;
+			min-height: 480px;
+			/* Increased to ensure button always fits */
+			max-height: 100%;
+		}
+
+		/* Special handling for left form to ensure button area */
+		.form:first-child {
+			padding-bottom: 80px;
+			/* Extra padding to ensure button space */
+		}
+
+		/* Position the button area absolutely at bottom of left card */
+		.form:first-child .text-center.mt-3 {
+			position: absolute;
+			bottom: 20px;
+			left: 20px;
+			right: 20px;
+			margin-top: 0 !important;
 		}
 
 		.form:hover {
@@ -240,11 +271,44 @@
 			backdrop-filter: blur(8px);
 			padding: 1rem;
 			flex: 1;
-			overflow: hidden;
+			overflow-y: auto;
+			overflow-x: hidden;
 			box-shadow:
 				0px 2px 4px rgba(0, 0, 0, 0.5),
 				0px 7px 13px rgba(0, 0, 0, 0.3),
 				inset 0px -3px 0px rgba(0, 0, 0, 0.2);
+			position: relative;
+			min-height: 0;
+			/* Critical: allows flex item to shrink */
+		}
+
+		/* Custom scrollbar styling */
+		.progress-log::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.progress-log::-webkit-scrollbar-track {
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 10px;
+		}
+
+		.progress-log::-webkit-scrollbar-thumb {
+			background: rgba(59, 130, 246, 0.5);
+			border-radius: 10px;
+			transition: background 0.3s;
+		}
+
+		.progress-log::-webkit-scrollbar-thumb:hover {
+			background: rgba(59, 130, 246, 0.7);
+		}
+
+		/* Ensure the right form column doesn't overflow */
+		.form.progress-column {
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			min-height: 480px;
+			/* Match left card minimum height */
 		}
 
 		/* Progress bar */
@@ -504,7 +568,7 @@
 			</form>
 
 			<!-- Right Column - Progress -->
-			<div class="form">
+			<div class="form progress-column">
 				<div class="section-heading">
 					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
 					PROGRESS
@@ -668,6 +732,12 @@
 			const lines = logDiv.getElementsByTagName('p');
 			while (lines.length > MAX_LOG_LINES) {
 				logDiv.removeChild(lines[0]);
+			}
+
+			// Auto-scroll to bottom to show latest log entry
+			const progressLogContainer = document.querySelector('.progress-log');
+			if (progressLogContainer) {
+				progressLogContainer.scrollTop = progressLogContainer.scrollHeight;
 			}
 		}
 

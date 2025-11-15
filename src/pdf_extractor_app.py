@@ -1014,4 +1014,10 @@ def open_file(filepath):
 
 # Start the application
 if __name__ == "__main__":
-    eel.start('index.html', mode="edge", size=(850, 700), port=0, app_mode=True, disable_cache=True)
+    eel.start('index.html', 
+        mode="edge", 
+        size=(850, 750),
+        port=0, 
+        app_mode=True, 
+        disable_cache=True
+    )
