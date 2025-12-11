@@ -231,14 +231,14 @@ class PDFExtractor:
                     is_continuation = False
                     if not is_header and found_header and re.match(r'^\d+\.\d+$', first_cell):
                         is_continuation = True
-                        
+
                         # For continuation tables, detect columns from first data row
-                        # because page breaks can shift column positions
+                        # because page breaks can shift column positions (extra None columns may appear)
                         if len(first_row) > 1:
-                            # Reset price/amount for this table's detection
-                            table_unit_price = None
-                            table_amount = None
-                            
+                            # Find all decimal number columns (prices/amounts) from right to left
+                            # Amount is always the rightmost decimal column, Unit Price is second from right
+                            decimal_columns = []
+
                             # Examine first row to find column positions
                             for idx, cell in enumerate(first_row):
                                 cell_str = str(cell).strip() if cell else ""
@@ -251,14 +251,17 @@ class PDFExtractor:
                                 # UOM - typically "Each"
                                 elif cell_str.lower() == 'each':
                                     pass  # We don't need UOM column index
-                                # Unit Price - has decimal point, larger than quantity
-                                elif re.match(r'^\d+\.\d{2,}$', cell_str):
-                                    if not table_unit_price:
-                                        col_unit_price = idx
-                                        table_unit_price = idx
-                                    else:
-                                        col_amount = idx
-                                        table_amount = idx
+                                # Decimal numbers - collect all, then assign unit price/amount from right
+                                elif re.match(r'^[\d,]+\.\d{2,}$', cell_str):
+                                    decimal_columns.append(idx)
+
+                            # Assign columns: Amount is rightmost, Unit Price is second from right
+                            if len(decimal_columns) >= 2:
+                                col_unit_price = decimal_columns[-2]
+                                col_amount = decimal_columns[-1]
+                            elif len(decimal_columns) == 1:
+                                # Only one decimal found - likely amount only
+                                col_amount = decimal_columns[-1]
                     
                     # Skip if this is neither a header table nor a continuation
                     if not is_header and not is_continuation:
@@ -301,10 +304,57 @@ class PDFExtractor:
                                 'ship_to': ship_to,
                                 'ordering_office': ordering_office
                             })
-        
+
+            # Fallback: Check for line items in raw text that weren't captured by table extraction
+            # This handles cases where pdfplumber doesn't include a row in the table boundaries
+            extracted_lines = {item['line'] for item in data}
+            page_text = page.extract_text() or ""
+
+            # Pattern to match line items in text format:
+            # "11.1 13P1025X001-7001 / REV: A 12-DEC-2025 540 Each 12.0700 6,517.8000"
+            text_line_pattern = re.compile(
+                r'^(\d+\.\d+)\s+'  # Line number (e.g., "11.1")
+                r'(\S+)\s*/\s*REV:\s*\S+\s+'  # Part number with REV
+                r'(\d{1,2}-[A-Z]{3}-\d{4})\s+'  # Delivery date (e.g., "12-DEC-2025")
+                r'(\d+)\s+'  # Quantity
+                r'Each\s+'  # UOM
+                r'([\d.]+)\s+'  # Unit price
+                r'([\d,.]+)',  # Amount
+                re.MULTILINE | re.IGNORECASE
+            )
+
+            for match in text_line_pattern.finditer(page_text):
+                line_num = match.group(1)
+                if line_num not in extracted_lines:
+                    part_num = match.group(2).strip()
+                    delivery_date = self.format_date_to_yyyymmdd(match.group(3))
+                    quantity = match.group(4)
+                    unit_price = match.group(5)
+                    amount = match.group(6).replace(',', '')
+
+                    update_progress(f"    Recovered line {line_num} from text (outside table boundary)")
+
+                    data.append({
+                        'pdf_file': pdf_name,
+                        'order_number': order_number,
+                        'order_date': order_date,
+                        'line': line_num,
+                        'part_number': part_num,
+                        'quantity': quantity,
+                        'unit_price': unit_price,
+                        'amount': amount,
+                        'delivery_date': delivery_date,
+                        'ship_to': ship_to,
+                        'ordering_office': ordering_office
+                    })
+                    extracted_lines.add(line_num)
+
         except Exception as e:
             update_progress(f"    Error in table parsing: {e}")
-        
+
+        # Sort data by line number to maintain order
+        data.sort(key=lambda x: float(x['line']) if x['line'] else 0)
+
         return data
     
     def parse_pdf_text(self, pdf, pdf_name):
@@ -586,7 +636,7 @@ class PDFExtractor:
             
             fieldnames = ['pdf_file', 'order_number', 'order_date', 'line',
                          'part_number', 'quantity', 'unit_price', 'amount',
-                         'delivery_date', 'ship_to', 'ordering_office']
+                         'delivery_date', 'ordering_office', 'ship_to']
             
             # Create DataFrame from new data
             new_df = pd.DataFrame(data, columns=fieldnames)
@@ -594,7 +644,7 @@ class PDFExtractor:
             # Rename columns to Title Case for better readability
             new_df.columns = ['PDF File', 'Order Number', 'Order Date', 'Line',
                              'Part Number', 'Quantity', 'Unit Price', 'Amount',
-                             'Delivery Date', 'Ship To', 'Ordering Office']
+                             'Delivery Date', 'Ordering Office', 'Ship To', ]
             
             # Convert numeric columns to proper numeric types
             numeric_columns = ['Quantity', 'Unit Price', 'Amount']

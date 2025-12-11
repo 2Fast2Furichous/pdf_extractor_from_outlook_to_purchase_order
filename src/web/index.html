@@ -30,7 +30,6 @@
 			perspective: 1000px;
 		}
 
-		/* Container */
 		.container {
 			max-width: 1200px;
 			margin: 0 auto;
@@ -50,7 +49,6 @@
 			/* Extra padding for bottom shadows */
 		}
 
-		/* Header */
 		.header-section {
 			display: flex;
 			align-items: center;
@@ -72,7 +70,6 @@
 			}
 		}
 
-		/* Main grid */
 		.main-grid {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -84,7 +81,6 @@
 			/* Changed from hidden to visible for shadows */
 		}
 
-		/* Glassy Form Card */
 		.form {
 			position: relative;
 			display: flex;
@@ -94,7 +90,6 @@
 			background: rgba(0, 0, 0, 0.6);
 			border-radius: 15px;
 			overflow: hidden;
-			/* Hide overflow to prevent content escape */
 			perspective: 1000px;
 			transform-style: preserve-3d;
 			transform: translateZ(0);
@@ -144,7 +139,6 @@
 			}
 		}
 
-		/* Glassy Input */
 		.input {
 			padding: 10px;
 			border-radius: 15px;
@@ -170,7 +164,6 @@
 			color: rgba(255, 255, 255, 0.7);
 		}
 
-		/* Apply to all input types explicitly */
 		input.input:hover,
 		input[type="text"].input:hover,
 		input[type="date"].input:hover,
@@ -207,7 +200,6 @@
 			transform: perspective(1000px) rotateY(3deg) rotateX(1deg) translateZ(3px) !important;
 		}
 
-		/* Glassy Button */
 		button,
 		.btn {
 			padding: 10px 20px;
@@ -252,7 +244,6 @@
 			background: rgba(59, 130, 246, 0.8);
 		}
 
-		/* Labels */
 		.label {
 			color: rgba(255, 255, 255, 0.9);
 			font-size: 11px;
@@ -263,7 +254,6 @@
 			letter-spacing: 0.5px;
 		}
 
-		/* Progress log */
 		.progress-log {
 			background: rgba(0, 0, 0, 0.4);
 			border-radius: 15px;
@@ -282,7 +272,6 @@
 			/* Critical: allows flex item to shrink */
 		}
 
-		/* Custom scrollbar styling */
 		.progress-log::-webkit-scrollbar {
 			width: 8px;
 		}
@@ -311,7 +300,6 @@
 			/* Match left card minimum height */
 		}
 
-		/* Progress bar */
 		.progress-bg {
 			background: rgba(0, 0, 0, 0.4);
 			height: 6px;
@@ -326,7 +314,6 @@
 			transition: width 0.3s ease;
 		}
 
-		/* Title */
 		.title {
 			font-size: 24px;
 			font-weight: 900;
@@ -341,7 +328,6 @@
 			color: rgba(255, 255, 255, 0.8);
 		}
 
-		/* Section heading */
 		.section-heading {
 			font-size: 12px;
 			font-weight: 700;
@@ -354,7 +340,6 @@
 			gap: 0.5rem;
 		}
 
-		/* Icon box */
 		.icon-box {
 			width: 50px;
 			height: 50px;
@@ -375,7 +360,6 @@
 			transform: rotateX(0deg) scale(1.1);
 		}
 
-		/* Spinner */
 		.spinner {
 			border: 2px solid rgba(255, 255, 255, 0.3);
 			border-top: 2px solid #fff;
@@ -395,7 +379,6 @@
 			}
 		}
 
-		/* Status dot */
 		.status-dot {
 			width: 8px;
 			height: 8px;
@@ -430,21 +413,18 @@
 			}
 		}
 
-		/* Divider */
 		.divider {
 			height: 1px;
 			background: rgba(255, 255, 255, 0.2);
 			margin: 1rem 0;
 		}
 
-		/* Date picker */
 		input[type="date"]::-webkit-calendar-picker-indicator {
 			filter: invert(1);
 			cursor: pointer;
 			opacity: 0.7;
 		}
 
-		/* Grid utilities */
 		.grid-2 {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -489,7 +469,6 @@
 
 <body>
 	<div class="container">
-		<!-- Header -->
 		<div class="header-section">
 			<div class="icon-box">
 				<svg xmlns="http://www.w3.org/2000/svg" style="width: 28px; height: 28px;" fill="none"
@@ -505,9 +484,7 @@
 			</div>
 		</div>
 
-		<!-- Main Grid -->
 		<div class="main-grid">
-			<!-- Left Column - Form -->
 			<form class="form">
 				<div class="section-heading">
 					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
@@ -567,14 +544,12 @@
 				</div>
 			</form>
 
-			<!-- Right Column - Progress -->
 			<div class="form progress-column">
 				<div class="section-heading">
 					<div style="width: 20px; height: 2px; background: rgba(255, 255, 255, 0.5);"></div>
 					PROGRESS
 				</div>
 
-				<!-- Progress Bar -->
 				<div id="progressBarContainer" class="hidden mb-2">
 					<div class="progress-bg">
 						<div id="progressBar" class="progress-fill" style="width: 0%"></div>
@@ -582,14 +557,12 @@
 					<p style="color: rgba(255, 255, 255, 0.7); font-size: 11px; margin-top: 6px;" id="progressText"></p>
 				</div>
 
-				<!-- Progress Log -->
 				<div class="progress-log">
 					<div id="progressLog" style="font-family: monospace; font-size: 11px; line-height: 1.4;">
 						<p style="color: rgba(255, 255, 255, 0.7);">Ready to start extraction...</p>
 					</div>
 				</div>
 
-				<!-- Status Bar -->
 				<div class="flex-between mt-3">
 					<div class="flex" style="align-items: center;">
 						<span class="status-dot active"></span>
@@ -602,13 +575,10 @@
 	</div>
 
 	<script>
-		// Global variables
 		let currentOutputPath = '';
 		const MAX_LOG_LINES = 100; // Maximum number of log lines to show
 
-		// Initialize on page load
 		window.addEventListener('DOMContentLoaded', async () => {
-			// Load saved settings
 			const settings = await eel.load_settings()();
 			if (settings) {
 				document.getElementById('email').value = settings.email_address || '';
@@ -616,7 +586,6 @@
 				document.getElementById('subject').value = settings.subject_contains || '';
 				document.getElementById('outputPath').value = settings.output_path || 'PO_Data.xlsx';
 
-				// Convert date format for input fields
 				if (settings.start_date) {
 					const startDate = convertDateToISO(settings.start_date);
 					document.getElementById('startDate').value = startDate;
@@ -628,7 +597,6 @@
 			}
 		});
 
-		// Convert MM/DD/YYYY to YYYY-MM-DD for date input
 		function convertDateToISO(dateStr) {
 			if (!dateStr) return '';
 			const parts = dateStr.split('/');
@@ -636,7 +604,6 @@
 			return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
 		}
 
-		// Convert YYYY-MM-DD to MM/DD/YYYY for backend
 		function convertDateFromISO(dateStr) {
 			if (!dateStr) return '';
 			const parts = dateStr.split('-');
@@ -644,7 +611,6 @@
 			return `${parts[1]}/${parts[2]}/${parts[0]}`;
 		}
 
-		// Browse for output file
 		async function browseOutput() {
 			const filename = await eel.browse_output_file()();
 			if (filename) {
@@ -652,9 +618,7 @@
 			}
 		}
 
-		// Start extraction
 		async function startExtraction() {
-			// Get values
 			const email = document.getElementById('email').value;
 			const folder = document.getElementById('folder').value;
 			const subject = document.getElementById('subject').value;
@@ -662,13 +626,11 @@
 			const endDate = convertDateFromISO(document.getElementById('endDate').value);
 			const outputPath = document.getElementById('outputPath').value;
 
-			// Validate
 			if (!email || !folder || !outputPath) {
 				alert('Please fill in Email Address, Folder, and Output File fields.');
 				return;
 			}
 
-			// Save settings
 			const settings = {
 				email_address: email,
 				folder_contains: folder,
@@ -679,15 +641,12 @@
 			};
 			await eel.save_settings(settings)();
 
-			// Clear progress log
 			document.getElementById('progressLog').innerHTML = '<p style="color: rgba(255, 255, 255, 0.9); font-size: 11px;">Starting extraction...</p>';
 
-			// Update status
 			const statusDot = document.querySelector('.status-dot');
 			statusDot.classList.remove('active', 'error');
 			statusDot.classList.add('processing');
 
-			// Show loading
 			document.getElementById('extractBtn').disabled = true;
 			document.getElementById('extractBtn').style.opacity = '0.5';
 			document.getElementById('loadingSpinner').classList.remove('hidden');
@@ -696,11 +655,9 @@
 
 			currentOutputPath = outputPath;
 
-			// Start extraction
 			await eel.extract_pdfs_from_outlook(email, folder, subject, startDate, endDate, outputPath)();
 		}
 
-		// Update progress from Python - keeps only last MAX_LOG_LINES lines
 		eel.expose(update_progress);
 		function update_progress(message) {
 			const logDiv = document.getElementById('progressLog');
@@ -709,7 +666,6 @@
 			newLine.style.fontSize = '11px';
 			newLine.style.lineHeight = '1.4';
 
-			// Color code messages
 			if (message.includes('ERROR')) {
 				newLine.style.color = '#ff6b6b';
 				newLine.style.fontWeight = '700';
@@ -725,29 +681,24 @@
 				newLine.style.color = 'rgba(255, 255, 255, 0.9)';
 			}
 
-			// Add new line
 			logDiv.appendChild(newLine);
 
-			// Keep only the last MAX_LOG_LINES lines
 			const lines = logDiv.getElementsByTagName('p');
 			while (lines.length > MAX_LOG_LINES) {
 				logDiv.removeChild(lines[0]);
 			}
 
-			// Auto-scroll to bottom to show latest log entry
 			const progressLogContainer = document.querySelector('.progress-log');
 			if (progressLogContainer) {
 				progressLogContainer.scrollTop = progressLogContainer.scrollHeight;
 			}
 		}
 
-		// Update status
 		eel.expose(update_status);
 		function update_status(status) {
 			document.getElementById('statusText').textContent = status.toUpperCase();
 		}
 
-		// Set extraction progress
 		eel.expose(set_extraction_progress);
 		function set_extraction_progress(current, total) {
 			const percent = (current / total) * 100;
@@ -755,7 +706,6 @@
 			document.getElementById('progressText').textContent = `${current} of ${total}`;
 		}
 
-		// Show error dialog
 		eel.expose(show_error);
 		function show_error(message) {
 			alert(`ERROR: ${message}`);
@@ -765,34 +715,28 @@
 			document.getElementById('statusText').textContent = 'ERROR';
 		}
 
-		// Show warning dialog
 		eel.expose(show_warning);
 		function show_warning(message) {
 			alert(`WARNING: ${message}`);
 		}
 
-		// Show info dialog
 		eel.expose(show_info);
 		function show_info(message) {
 			alert(message);
 		}
 
-		// Ask retry for PDF save
 		eel.expose(ask_retry_pdf);
 		function ask_retry_pdf(filename) {
 			return confirm(`Cannot save PDF:\n${filename}\n\nFile may be open. Close it and click OK to retry.`);
 		}
 
-		// Ask retry for file write
 		eel.expose(ask_retry_file);
 		function ask_retry_file(filepath, attempt, maxRetries) {
 			return confirm(`Cannot write to:\n${filepath}\n\nClose the file and click OK.\n\nAttempt ${attempt} of ${maxRetries}`);
 		}
 
-		// Extraction complete with prompt to open
 		eel.expose(extraction_complete_with_prompt);
 		function extraction_complete_with_prompt(itemCount, outputPath) {
-			// Update status
 			const statusDot = document.querySelector('.status-dot');
 			statusDot.classList.remove('processing', 'error');
 			statusDot.classList.add('active');
@@ -803,7 +747,6 @@
 			document.getElementById('statusText').textContent = 'COMPLETE';
 			document.getElementById('itemCount').textContent = `${itemCount} items`;
 
-			// Ask to open file
 			if (confirm(`Extracted ${itemCount} items.\n\nOpen output file?`)) {
 				eel.open_file(outputPath)();
 			}
